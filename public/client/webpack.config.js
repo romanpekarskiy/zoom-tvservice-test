@@ -1,21 +1,24 @@
 var path = require('path');
 module.exports = {
-    entry: './src/app.js',
+    entry: path.resolve('./src/app.js'),
     devtool : 'source-map',
     output: {
         path: 'out',
         filename: 'app.bundle.js'
     },
     resolve: {
-        root: '../../',
-        modulesDirectories: ['public/client/src', 'node_modules']
+        root: path.resolve('../..'),
+        modulesDirectories: [
+            'public/client/src',
+            'node_modules',
+        ]
     },
     module: {
         loaders: [
             {
                 loader: 'babel',
                 query: {
-                    presets: ['es2015']
+                    presets: [path.resolve('../../node_modules/babel-preset-es2015')]
                 }
             }
         ]
