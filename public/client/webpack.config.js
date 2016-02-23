@@ -7,10 +7,9 @@ module.exports = {
         filename: 'app.bundle.js'
     },
     resolve: {
-        root: path.resolve('../..'),
-        modulesDirectories: [
-            'public/client/src',
-            'node_modules',
+        root: [
+            path.resolve('./src'),
+            path.resolve('../../node_modules')
         ]
     },
     module: {

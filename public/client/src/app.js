@@ -1,5 +1,8 @@
 import Channel from 'models/channel';
+import AppView from 'views/app';
 
-console.log(Channel);
+var app = new AppView();
+document.body.appendChild(app.el);
+app.render();
 
-window.Channel = Channel;
+window.app = app;
