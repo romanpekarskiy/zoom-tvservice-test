@@ -1,10 +1,14 @@
 import Backbone from 'backbone';
-import _ from 'underscore';
 import PlayerView from 'views/player';
 import $ from 'jquery';
 import keyCodes from 'utils/keyCodes';
 
+function numberCap(seeking, max){
+    return (seeking % max + max) % max;
+}
+
 let AppView = Backbone.View.extend({
+	currentChannel: undefined,
 	initialize: function () {
 		this.player = new PlayerView();
 		this.el.appendChild(this.player.el);
@@ -24,15 +28,19 @@ let AppView = Backbone.View.extend({
 				break;
 			}
 		});
-		this.player.play('http://kprf-live.cdn.ngenix.net/live/_definst_/stream_high/playlist.m3u8');
+		this.playChannel(this.collection.first());
 	},
 
 	nextChannel: function(){
-
+		let currentIndx = this.collection.indexOf(this.currentChannel);
+		let nextChannelIndx = numberCap(++currentIndx, this.collection.length);
+		this.playChannel(this.collection.models[nextChannelIndx]);
 	},
 
 	prevChannel: function(){
-
+		let currentIndx = this.collection.indexOf(this.currentChannel);
+		let nextChannelIndx = numberCap(--currentIndx, this.collection.length);
+		this.playChannel(this.collection.models[nextChannelIndx]);
 	},
 
 	toggleInfo: function(){
@@ -40,7 +48,8 @@ let AppView = Backbone.View.extend({
 	},
 
 	playChannel: function( channel ){
-		var location = channel.location;
+		this.currentChannel = channel;
+		let location = channel.get('location');
 		this.player.play(location);
 	},
 
