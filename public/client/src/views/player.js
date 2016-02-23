@@ -5,6 +5,9 @@ let PlayerView = Backbone.View.extend({
 	initialize: function () {
 		this.videoElement = document.createElement('video');
 		this.preloader = new PreloaderView();
+		this.on('connecting',() => this.preloader.show());
+		this.on('buffering',() => this.preloader.show());
+		this.on('playing',() => this.preloader.hide());
 
 		this.el.appendChild(this.videoElement);
 		this.el.appendChild(this.preloader.el);
@@ -26,24 +29,24 @@ let PlayerView = Backbone.View.extend({
 			    this.play = this._play;
 			    
 				this.mediaElement.addEventListener('playing',() => {
-					this.preloader.hide();
+					this.trigger('playing');
 				}, false);
 
 				this.mediaElement.addEventListener('waiting',() => {
-					this.preloader.show();
+					this.trigger('buffering');
 				}, false);
 
 				this.mediaElement.addEventListener('stalled',() => {
-					this.preloader.show();
+					this.trigger('buffering');
 				}, false);
 
 			    this.mediaElement.play();
 			},
 		});
-		this.preloader.show();
+		this.trigger('connecting');
 	},
 	play: function( location ){
-		this.preloader.show();
+		this.trigger('connecting');
 		this.mediaElement.setSrc(location);
 		this.mediaElement.play();
 	}

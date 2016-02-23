@@ -1,5 +1,7 @@
 import Backbone from 'backbone';
+import _ from 'underscore';
 import PlayerView from 'views/player';
+import InfoPanelView from 'views/infopanel';
 import $ from 'jquery';
 import keyCodes from 'utils/keyCodes';
 
@@ -12,6 +14,10 @@ let AppView = Backbone.View.extend({
 	initialize: function () {
 		this.player = new PlayerView();
 		this.el.appendChild(this.player.el);
+
+		this.infopanel = new InfoPanelView();
+		this.el.appendChild(this.infopanel.el);
+
 		$(document).keydown((ev) => {
 			let keyCode = ev.keyCode;
 			switch(keyCode){
@@ -28,6 +34,8 @@ let AppView = Backbone.View.extend({
 				break;
 			}
 		});
+		this.player.on('playing',() => this.showInfo(3000));
+
 		this.playChannel(this.collection.first());
 	},
 
@@ -43,12 +51,32 @@ let AppView = Backbone.View.extend({
 		this.playChannel(this.collection.models[nextChannelIndx]);
 	},
 
-	toggleInfo: function(){
+	showInfo: function( delay ){
+		if(delay != undefined){
+			clearTimeout(this.infopanelHidingTO);
+			this.infopanelHidingTO = setTimeout(() => {
+				this.infopanel.hide();
+			}, delay);
+		} else {
+			clearTimeout(this.infopanelHidingTO);
+		}
+		this.infopanel.show();
+	},
 
+	toggleInfo: function(){
+		if(this.infopanel.showed){
+			this.infopanel.hide();
+		} else {
+			this.infopanel.show();
+		}
 	},
 
 	playChannel: function( channel ){
 		this.currentChannel = channel;
+
+		this.infopanel.model = channel;
+		this.infopanel.render();
+		
 		let location = channel.get('location');
 		this.player.play(location);
 	},

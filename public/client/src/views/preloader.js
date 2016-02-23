@@ -3,8 +3,7 @@ import Backbone from 'backbone';
 let PreloaderView = Backbone.View.extend({
 	className:'preloader hidden',
 	initialize: function () {
-		this.el.textContent = 'preloader!';
-
+		// this.el.textContent = 'preloader!';
 	},
 	show: function(){
 		this.el.className = 'preloader';
