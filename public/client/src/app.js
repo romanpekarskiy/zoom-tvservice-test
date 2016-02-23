@@ -1,4 +1,4 @@
-import Channel from 'models/channel';
+import ChannelCollection from 'models/channelCollection'
 import AppView from 'views/app';
 
 var app = new AppView();

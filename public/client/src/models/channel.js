@@ -1,7 +1,7 @@
 import Backbone from 'backbone';
 
-let Channel = Backbone.Model.extend({
+let ChannelModel = Backbone.Model.extend({
 
 });
 
-export default Channel
+export default ChannelModel
