@@ -16,8 +16,16 @@ function createDOM(type, classname, parent) {
 let ChannelView = Backbone.View.extend({
 	className:'channel',
 	initialize: function(argument) {
-		this.titleField = new EditableField({model:this.model, fieldName: 'title'});
-		this.locationField = new EditableField({model:this.model, fieldName: 'location'});
+		this.titleField = new EditableField({
+			model:this.model,
+			fieldName: 'title',
+			label:'Название:',
+		});
+		this.locationField = new EditableField({
+			model:this.model,
+			fieldName: 'location',
+			label:'URL',
+		});
 		this.el.appendChild( this.titleField.el );
 		this.el.appendChild( this.locationField.el );
 

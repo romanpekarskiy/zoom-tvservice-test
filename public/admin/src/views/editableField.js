@@ -16,6 +16,11 @@ let EditableField = Backbone.View.extend({
 	className:'field-wrapper',
 	initialize: function(options) {
 		this.fieldName = options.fieldName;
+		this.label = options.label;
+
+		this.labelDOM = createDOM('div','label', this.el);
+		this.labelDOM.textContent = this.label;
+		
 		this.fieldDOM = createDOM('div', 'field', this.el);
 		this.inputDOM = createDOM('input', 'input', this.el);
 
