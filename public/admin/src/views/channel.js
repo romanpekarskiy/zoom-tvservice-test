@@ -30,7 +30,7 @@ let ChannelView = Backbone.View.extend({
 		this.el.appendChild( this.locationField.el );
 
 		this.removeBtn = createDOM('div','remove',this.el);
-		this.removeBtn.textContent = 'REMOVE!';
+		// this.removeBtn.textContent = 'REMOVE!';
 		this.removeBtn.onclick = () => this.model.destroy();
 
 		this.listenTo(this.model, 'change', this.render);

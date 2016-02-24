@@ -1,5 +1,35 @@
 .channel {
-    height: 70px;
     border: 1px solid black;
     padding: 10px;
+    margin: 15px;
+    position: relative;
+    .field{
+        .label{
+            display: inline-block;
+            width: 120px;
+        }
+        .field-wrapper{
+            display: inline-block;
+            width: 600px;
+            height: 20px;
+            .field{
+                height: 100%;
+                padding: 0;
+                min-width: 100%;
+            }
+            .input{
+                height: 100%;
+                padding: 0;
+                min-width: 100%;
+            }
+        }
+    }
+    .remove{
+        width: 20px;
+        height: 20px;
+        position: absolute;
+        right: 0px;
+        top: 0px;
+        background: red;
+    }
 }

@@ -13,20 +13,22 @@ function createDOM(type, classname, parent) {
 }
 
 let EditableField = Backbone.View.extend({
-	className:'field-wrapper',
+	className:'field',
 	initialize: function(options) {
 		this.fieldName = options.fieldName;
 		this.label = options.label;
 
 		this.labelDOM = createDOM('div','label', this.el);
 		this.labelDOM.textContent = this.label;
-		
-		this.fieldDOM = createDOM('div', 'field', this.el);
-		this.inputDOM = createDOM('input', 'input', this.el);
+
+		this.fieldWrapperDOM = createDOM('div','field-wrapper', this.el);
+
+		this.fieldDOM = createDOM('div', 'field', this.fieldWrapperDOM);
+		this.inputDOM = createDOM('input', 'input', this.fieldWrapperDOM);
 
 		this.listenTo(this.model, 'change', this.render);
 
-		this.fieldDOM.onclick = () => this.edit();
+		this.fieldDOM.ondblclick = () => this.edit();
 		this.inputDOM.onchange = () => {
 			this.model.set(this.fieldName, this.inputDOM.value);
 			this.model.save();
