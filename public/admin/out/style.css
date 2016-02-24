@@ -1,0 +1,33 @@
+.channel {
+  border: 1px solid black;
+  padding: 10px;
+  margin: 15px;
+  position: relative;
+}
+.channel .field .label {
+  display: inline-block;
+  width: 120px;
+}
+.channel .field .field-wrapper {
+  display: inline-block;
+  width: 600px;
+  height: 20px;
+}
+.channel .field .field-wrapper .field {
+  height: 100%;
+  padding: 0;
+  min-width: 100%;
+}
+.channel .field .field-wrapper .input {
+  height: 100%;
+  padding: 0;
+  min-width: 100%;
+}
+.channel .remove {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  background: red;
+}

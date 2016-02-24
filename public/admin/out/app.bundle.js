@@ -46,33 +46,15 @@
 
 	'use strict';
 	
-	var _channelCollection = __webpack_require__(1);
-	
-	var _channelCollection2 = _interopRequireDefault(_channelCollection);
-	
-	var _app = __webpack_require__(7);
+	var _app = __webpack_require__(10);
 	
 	var _app2 = _interopRequireDefault(_app);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var channelCollection = new _channelCollection2.default();
+	var app = new _app2.default();
 	
-	channelCollection.fetch({
-		success: function success() {
-			var app = new _app2.default({
-				collection: channelCollection
-			});
-	
-			document.body.appendChild(app.el);
-	
-			app.render();
-	
-			window.app = app;
-		}
-	});
-	
-	window.channelCollection = channelCollection;
+	document.body.appendChild(app.el);
 
 /***/ },
 /* 1 */
@@ -5246,7 +5228,8 @@
 		defaults: {
 			title: 'untitled',
 			location: ''
-		}
+		},
+		idAttribute: '_id'
 	});
 	
 	exports.default = ChannelModel;
@@ -5269,109 +5252,48 @@
 	
 	var _underscore2 = _interopRequireDefault(_underscore);
 	
-	var _player = __webpack_require__(8);
+	var _channel = __webpack_require__(8);
 	
-	var _player2 = _interopRequireDefault(_player);
-	
-	var _infopanel = __webpack_require__(10);
-	
-	var _infopanel2 = _interopRequireDefault(_infopanel);
-	
-	var _jquery = __webpack_require__(4);
-	
-	var _jquery2 = _interopRequireDefault(_jquery);
-	
-	var _keyCodes = __webpack_require__(11);
-	
-	var _keyCodes2 = _interopRequireDefault(_keyCodes);
+	var _channel2 = _interopRequireDefault(_channel);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function numberCap(seeking, max) {
-		return (seeking % max + max) % max;
-	}
+	var ChannelList = _backbone2.default.View.extend({
+		views: [],
 	
-	var AppView = _backbone2.default.View.extend({
-		currentChannel: undefined,
 		initialize: function initialize() {
+			this.listenTo(this.collection, 'add', this.onAddOne);
+			this.listenTo(this.collection, 'reset', this.onReset);
+			this.onReset();
+		},
+	
+		render: function render() {
+			_underscore2.default.each(this.views, function (view) {
+				return view.render();
+			});
+		},
+	
+		onReset: function onReset() {
 			var _this = this;
 	
-			this.player = new _player2.default();
-			this.el.appendChild(this.player.el);
-	
-			this.infopanel = new _infopanel2.default();
-			this.el.appendChild(this.infopanel.el);
-	
-			(0, _jquery2.default)(document).keydown(function (ev) {
-				var keyCode = ev.keyCode;
-				switch (keyCode) {
-					case _keyCodes2.default.UP:
-						_this.nextChannel();
-						break;
-	
-					case _keyCodes2.default.DOWN:
-						_this.prevChannel();
-						break;
-	
-					case _keyCodes2.default.SPACE:
-						_this.toggleInfo();
-						break;
-				}
+			_underscore2.default.each(this.views, function (view) {
+				return view.remove();
 			});
-			this.player.on('playing', function () {
-				return _this.showInfo(3000);
+			this.views = [];
+			this.collection.forEach(function (model) {
+				return _this.onAddOne(model);
 			});
-			this.playChannel(this.collection.first());
 		},
 	
-		nextChannel: function nextChannel() {
-			var currentIndx = this.collection.indexOf(this.currentChannel);
-			var nextChannelIndx = numberCap(++currentIndx, this.collection.length);
-			this.playChannel(this.collection.models[nextChannelIndx]);
-		},
+		onAddOne: function onAddOne(channel) {
+			var newview = new _channel2.default({ model: channel });
+			this.views.push(newview);
+			this.el.appendChild(newview.el);
+		}
 	
-		prevChannel: function prevChannel() {
-			var currentIndx = this.collection.indexOf(this.currentChannel);
-			var nextChannelIndx = numberCap(--currentIndx, this.collection.length);
-			this.playChannel(this.collection.models[nextChannelIndx]);
-		},
-	
-		showInfo: function showInfo(delay) {
-			var _this2 = this;
-	
-			if (delay != undefined) {
-				clearTimeout(this.infopanelHidingTO);
-				this.infopanelHidingTO = setTimeout(function () {
-					_this2.infopanel.hide();
-				}, delay);
-			} else {
-				clearTimeout(this.infopanelHidingTO);
-			}
-			this.infopanel.show();
-		},
-	
-		toggleInfo: function toggleInfo() {
-			if (this.infopanel.showed) {
-				this.infopanel.hide();
-			} else {
-				this.infopanel.show();
-			}
-		},
-	
-		playChannel: function playChannel(channel) {
-			this.currentChannel = channel;
-	
-			this.infopanel.model = channel;
-			this.infopanel.render();
-	
-			var location = channel.get('location');
-			this.player.play(location);
-		},
-	
-		render: function render() {}
 	});
 	
-	exports.default = AppView;
+	exports.default = ChannelList;
 
 /***/ },
 /* 8 */
@@ -5387,74 +5309,66 @@
 	
 	var _backbone2 = _interopRequireDefault(_backbone);
 	
-	var _preloader = __webpack_require__(9);
+	var _jquery = __webpack_require__(4);
 	
-	var _preloader2 = _interopRequireDefault(_preloader);
+	var _jquery2 = _interopRequireDefault(_jquery);
+	
+	var _editableField = __webpack_require__(9);
+	
+	var _editableField2 = _interopRequireDefault(_editableField);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var PlayerView = _backbone2.default.View.extend({
-		initialize: function initialize() {
+	function createDOM(type, classname, parent) {
+		var dom = document.createElement(type);
+		if (classname) {
+			dom.className = classname;
+		}
+		if (parent) {
+			parent.appendChild(dom);
+		}
+		return dom;
+	}
+	
+	var ChannelView = _backbone2.default.View.extend({
+		className: 'channel',
+		initialize: function initialize(argument) {
 			var _this = this;
 	
-			this.videoElement = document.createElement('video');
-			this.preloader = new _preloader2.default();
-			this.on('connecting', function () {
-				return _this.preloader.show();
+			this.titleField = new _editableField2.default({
+				model: this.model,
+				fieldName: 'title',
+				label: 'Название:'
 			});
-			this.on('buffering', function () {
-				return _this.preloader.show();
+			this.locationField = new _editableField2.default({
+				model: this.model,
+				fieldName: 'location',
+				label: 'URL'
 			});
-			this.on('playing', function () {
-				return _this.preloader.hide();
-			});
+			this.el.appendChild(this.titleField.el);
+			this.el.appendChild(this.locationField.el);
 	
-			this.el.appendChild(this.videoElement);
-			this.el.appendChild(this.preloader.el);
+			this.removeBtn = createDOM('div', 'remove', this.el);
+			// this.removeBtn.textContent = 'REMOVE!';
+			this.removeBtn.onclick = function () {
+				return _this.model.destroy();
+			};
 	
-			this._play = this.play;
-			this.play = this.firstPlay;
+			this.listenTo(this.model, 'change', this.render);
+			this.listenTo(this.model, 'destroy', this.remove);
+	
+			this.titleField.render();
+			this.locationField.render();
 		},
-		firstPlay: function firstPlay(location) {
-			var _this2 = this;
-	
-			var self = this;
-			this.videoElement.src = location;
-			this.mediaElement = new MediaElement(this.videoElement, {
-				pluginPath: 'mediaelement/',
-				flashName: 'flashmediaelement.swf',
-				silverlightName: 'silverlightmediaelement.xap',
-				defaultVideoWidth: '100%',
-				defaultVideoHeight: '100%',
-				timerRate: 250,
-				success: function success(mediaElement, domObject) {
-					_this2.play = _this2._play;
-	
-					_this2.mediaElement.addEventListener('playing', function () {
-						_this2.trigger('playing');
-					}, false);
-	
-					_this2.mediaElement.addEventListener('waiting', function () {
-						_this2.trigger('buffering');
-					}, false);
-	
-					_this2.mediaElement.addEventListener('stalled', function () {
-						_this2.trigger('buffering');
-					}, false);
-	
-					_this2.mediaElement.play();
-				}
-			});
-			this.trigger('connecting');
-		},
-		play: function play(location) {
-			this.trigger('connecting');
-			this.mediaElement.setSrc(location);
-			this.mediaElement.play();
+		render: function render() {
+			this.titleField.render();
+			this.locationField.render();
+			// this.titleDOM.textContent = this.model.get('title');
+			// this.locationDOM.textContent = this.model.get('location');
 		}
 	});
 	
-	exports.default = PlayerView;
+	exports.default = ChannelView;
 
 /***/ },
 /* 9 */
@@ -5470,22 +5384,64 @@
 	
 	var _backbone2 = _interopRequireDefault(_backbone);
 	
+	var _jquery = __webpack_require__(4);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var PreloaderView = _backbone2.default.View.extend({
-		className: 'preloader hidden',
-		initialize: function initialize() {
-			// this.el.textContent = 'preloader!';
+	function createDOM(type, classname, parent) {
+		var dom = document.createElement(type);
+		if (classname) {
+			dom.className = classname;
+		}
+		if (parent) {
+			parent.appendChild(dom);
+		}
+		return dom;
+	}
+	
+	var EditableField = _backbone2.default.View.extend({
+		className: 'field',
+		initialize: function initialize(options) {
+			var _this = this;
+	
+			this.fieldName = options.fieldName;
+			this.label = options.label;
+	
+			this.labelDOM = createDOM('div', 'label', this.el);
+			this.labelDOM.textContent = this.label;
+	
+			this.fieldWrapperDOM = createDOM('div', 'field-wrapper', this.el);
+	
+			this.fieldDOM = createDOM('div', 'field', this.fieldWrapperDOM);
+			this.inputDOM = createDOM('input', 'input', this.fieldWrapperDOM);
+	
+			this.listenTo(this.model, 'change', this.render);
+	
+			this.fieldDOM.ondblclick = function () {
+				return _this.edit();
+			};
+			this.inputDOM.onchange = function () {
+				_this.model.set(_this.fieldName, _this.inputDOM.value);
+				_this.model.save();
+			};
 		},
-		show: function show() {
-			this.el.className = 'preloader';
+		edit: function edit() {
+			(0, _jquery2.default)(this.fieldDOM).hide();
+			(0, _jquery2.default)(this.inputDOM).show();
 		},
-		hide: function hide() {
-			this.el.className = 'preloader hidden';
+		render: function render() {
+			(0, _jquery2.default)(this.fieldDOM).show();
+			(0, _jquery2.default)(this.inputDOM).hide();
+	
+			var fieldValue = this.model.get(this.fieldName);
+			this.fieldDOM.textContent = fieldValue;
+			this.inputDOM.value = fieldValue;
 		}
 	});
 	
-	exports.default = PreloaderView;
+	exports.default = EditableField;
 
 /***/ },
 /* 10 */
@@ -5501,78 +5457,66 @@
 	
 	var _backbone2 = _interopRequireDefault(_backbone);
 	
+	var _underscore = __webpack_require__(3);
+	
+	var _underscore2 = _interopRequireDefault(_underscore);
+	
+	var _channelCollection = __webpack_require__(1);
+	
+	var _channelCollection2 = _interopRequireDefault(_channelCollection);
+	
+	var _channellist = __webpack_require__(7);
+	
+	var _channellist2 = _interopRequireDefault(_channellist);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function cap2(number) {
-		var result = number + '';
-		if (result.length < 2) {
-			result = '0' + result;
+	function createDOM(type, classname, parent) {
+		var dom = document.createElement(type);
+		if (classname) {
+			dom.className = classname;
 		}
-		return result;
+		if (parent) {
+			parent.appendChild(dom);
+		}
+		return dom;
 	}
 	
-	var InfoPanelView = _backbone2.default.View.extend({
-		className: 'infopanel',
-		showed: true,
-		initialize: function initialize() {
-			this.channelTitleDOM = document.createElement('div');
-			this.channelTitleDOM.className = 'title';
-			this.channelTitleDOM.textContent = 'lasdawdw';
-			this.el.appendChild(this.channelTitleDOM);
+	var AppView = _backbone2.default.View.extend({
+		views: [],
 	
-			this.currentTimeDOM = document.createElement('div');
-			this.currentTimeDOM.className = 'time';
-			this.el.appendChild(this.currentTimeDOM);
-			this.updateTime();
-		},
-		updateTime: function updateTime() {
+		initialize: function initialize() {
 			var _this = this;
 	
-			console.log('updateTime');
-			var time = new Date();
-			var minutes = cap2(time.getMinutes());
-			var hours = cap2(time.getHours());
+			this.channelListWrapper = createDOM('div', 'channellist-wrapper', this.el);
+			this.addBtn = createDOM('div', 'add-btn', this.el);
+			this.addBtn.textContent = 'Add Channel';
+			this.addBtn.onclick = function () {
+				return _this.channelCollection.create();
+			};
+			this.channelCollection = new _channelCollection2.default();
 	
-			this.currentTimeDOM.textContent = hours + ':' + minutes;
+			this.loadChannels();
+		},
+		loadChannels: function loadChannels() {
+			var _this2 = this;
 	
-			var remainingTime = (60 - new Date().getSeconds()) * 1000;
-			console.log(remainingTime);
-			setTimeout(function () {
-				return _this.updateTime();
-			}, remainingTime);
+			this.channelCollection.fetch({
+				success: function success() {
+					_this2.channelList = new _channellist2.default({
+						collection: _this2.channelCollection
+					});
+	
+					_this2.channelListWrapper.appendChild(_this2.channelList.el);
+					_this2.channelList.render();
+				}
+			});
 		},
-		render: function render() {
-			this.channelTitleDOM.textContent = this.model.get('title');
-		},
-		show: function show() {
-			this.render();
-			this.showed = true;
-			this.el.className = 'infopanel';
-		},
-		hide: function hide() {
-			this.showed = false;
-			this.el.className = 'infopanel hidden';
-		}
+	
+		render: function render() {}
 	});
 	
-	exports.default = InfoPanelView;
-
-/***/ },
-/* 11 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.default = {
-		LEFT: 37,
-		UP: 38,
-		RIGHT: 39,
-		DOWN: 40,
-		SPACE: 32
-	};
+	exports.default = AppView;
 
 /***/ }
 /******/ ]);

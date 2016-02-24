@@ -1,5 +1,4 @@
 import ChannelCollection from 'models/channelCollection';
-import ChannelModel from 'models/channel';
 import AppView from 'views/app';
 
 let channelCollection = new ChannelCollection();
