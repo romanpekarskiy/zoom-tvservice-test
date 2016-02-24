@@ -35,8 +35,7 @@ let AppView = Backbone.View.extend({
 			}
 		});
 		this.player.on('playing',() => this.showInfo(3000));
-
-		this.playChannel(this.collection.first());
+		this.initialPlay();
 	},
 
 	nextChannel: function(){
@@ -49,6 +48,12 @@ let AppView = Backbone.View.extend({
 		let currentIndx = this.collection.indexOf(this.currentChannel);
 		let nextChannelIndx = numberCap(--currentIndx, this.collection.length);
 		this.playChannel(this.collection.models[nextChannelIndx]);
+	},
+
+	initialPlay: function(){
+		let lastPlayedChannelID = localStorage.getItem('lastChannelID');
+		var channel = this.collection.get(lastPlayedChannelID) || this.collection.first();
+		this.playChannel(channel);	
 	},
 
 	showInfo: function( delay ){
@@ -72,6 +77,7 @@ let AppView = Backbone.View.extend({
 	},
 
 	playChannel: function( channel ){
+		localStorage.setItem('lastChannelID',channel.id);
 		this.currentChannel = channel;
 
 		this.infopanel.model = channel;
