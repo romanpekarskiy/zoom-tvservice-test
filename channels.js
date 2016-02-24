@@ -2,6 +2,7 @@ var DB = require('nedb');
 var channels = new DB({ filename: 'channels.db', autoload: true });
 var express = require('express');
 var router = express.Router();
+var auth = require('./auth');
 
 router.route('/')
 	.get(function(req, res){
@@ -13,7 +14,7 @@ router.route('/')
 			}
 		});
 	})
-	.post(function(req, res){
+	.post(auth, function(req, res){
 		var channel = req.body;
 		console.log('channel',channel);
 		channels.insert(channel, function(err, newDoc){
@@ -36,7 +37,7 @@ router.route('/:channelId')
 			}
 		});
 	})
-	.delete(function(req, res){
+	.delete(auth, function(req, res){
 		var chId = req.params.channelId;
 		channels.remove({_id:chId}, function(err, numRemoved){
 			if(err){
@@ -46,7 +47,7 @@ router.route('/:channelId')
 			}
 		});
 	})
-	.put(function(req, res){
+	.put(auth, function(req, res){
 		var chId = req.params.channelId;
 		channels.update({_id:chId}, req.body, {}, function(err, numReplaced){
 			if(err){
