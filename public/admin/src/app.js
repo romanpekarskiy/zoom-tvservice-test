@@ -1,18 +1,5 @@
-import ChannelCollection from 'models/channelCollection';
-import ChannelList from 'views/channellist';
+import AppView from 'views/app';
 
-let channelCollection = new ChannelCollection();
+let app = new AppView();
 
-channelCollection.fetch({
-	success: function() {
-		let app = new ChannelList({
-			collection: channelCollection
-		});
-
-		document.body.appendChild(app.el);
-
-		app.render();
-
-		window.app = app;
-	}
-})
+document.body.appendChild(app.el);
