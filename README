@@ -1,4 +1,7 @@
+to start:
+npm install
 node server.js
+
 
 client on http://localhost:8080/client/
 admin on http://localhost:8080/admin/
